@@ -18,14 +18,14 @@ class MessageSent implements ShouldBroadcast
 
     public $message;
     public $user;
-    public $success;
+    public $receiver;
 
   
-    public function __construct($message, $user, $success = true)
+    public function __construct($message, $user, $receiver )
     {
         $this->message = $message;
         $this->user = $user;
-        $this->success = $success;
+        $this->receiver = $receiver;
     }
 
     /**

@@ -35,7 +35,7 @@
                                     @if (Auth::user()->id === $u->id)
                                     @else
                                         <li class="p-2 border-bottom" style="background-color: #eee;">
-                                            <a href="#!" class="d-flex justify-content-between">
+                                            <a href="{{ url('/chat-page?id='.$u->id) }}" class="d-flex justify-content-between">
                                                 <div class="d-flex flex-row">
                                                     <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-8.webp"
                                                         alt="avatar"
@@ -55,7 +55,7 @@
                                     @endif
                                 @endforeach
                             </ul>
-
+                            <a href="{{ url('/logout') }}">logout</a>
                         </div>
                     </div>
 

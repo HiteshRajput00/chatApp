@@ -55,7 +55,7 @@
                                 @endif
                                 @endforeach
                             </ul>
-<a href="{{ url('/logout') }}">logout</a>
+                         <a href="{{ url('/logout') }}">logout</a>
                         </div>
                     </div>
 

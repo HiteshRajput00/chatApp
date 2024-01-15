@@ -18,14 +18,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('forms.index');
+})->name('login');
+
+Route::Post('/login', [AuthenticationController::class, 'login']);
+Route::Post('/register', [AuthenticationController::class, 'register']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/chat-page', [ChatController::class, 'chatPage']);
+
+    //::::::::::::::::::: chat routes ::::::::::::::::::::::::::::::://
+    Route::post('/send-message', [ChatController::class, 'sendMessage']);
+    Route::get('/logout', [AuthenticationController::class, 'logout']);
 });
-
-Route::Post('/login',[AuthenticationController::class,'login']);
-Route::Post('/register',[AuthenticationController::class,'register']);
-
-Route::get('/dashboard',[DashboardController::class,'index']);
-Route::get('/chat-page',[ChatController::class,'chatPage']);
-
-//::::::::::::::::::: chat routes ::::::::::::::::::::::::::::::://
-Route::post('/send-message', [ChatController::class,'sendMessage']);
-Route::get('/logout',[AuthenticationController::class,'logout']);
