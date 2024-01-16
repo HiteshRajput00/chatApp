@@ -26,34 +26,22 @@ class ChatController extends Controller
         return view('chat-page.index', compact('messages','user','id'));
     }
 
-    public function fetchMessages()
-    {
-        return Message::with('user')->get();
-    }
-
     public function sendMessage(Request $request)
     {
         $u = User::find(Auth::user()->id);
         $user = $u->name;
-        $reciver_id =$request->input('reciver');
-        $m = new Message();
+        $receiver =$request->input('reciver');
+        $sender = Auth::user()->id;
 
-        // Set the user_id, content, and receiver_id values
+        $m = new Message();
         $m->user_id = Auth::user()->id;
         $m->content = $request->input('message');
-        $m->reciver_id = $reciver_id;
+        $m->reciver_id = $receiver;
         $m->save();
 
         $message = $request->input('message');
-        
-        if ($user && $message) {
-            $success = true;
-        } else {
-            $success = false;
-        }
-        event(new MessageSent($message, $user, $success));
 
-
+        event(new MessageSent($message, $user, $sender,$receiver));
 
         return response()->json(['status' => $user . $message]);
     }

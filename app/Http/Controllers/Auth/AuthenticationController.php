@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticationController extends Controller
 {
+    public function index()
+    {
+        return view('forms.index');
+    }
+
     public function login(Request $request)
     {
         $credent =  $request->validate([
@@ -18,7 +23,10 @@ class AuthenticationController extends Controller
 
           if(Auth::attempt($credent)){
             return redirect(url('/dashboard'));
-          }
+          }else{
+            return redirect(url('/'))->with('error','incorrect email and password');
+          } 
+
     }
 
     public function register(Request $request)

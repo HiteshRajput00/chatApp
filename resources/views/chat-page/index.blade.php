@@ -11,20 +11,14 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <!-- MDB -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.1.0/mdb.min.css" rel="stylesheet" />
+
     <title>Chat</title>
-    <!-- Include Laravel Echo CDN with Babel transpilation -->
-    {{-- <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.15.3/dist/echo.iife.js"></script>
-    <script src="https://js.pusher.com/8.0.1/pusher.min.js"></script> --}}
-
-
 
 </head>
 
 <body>
-
     <section style="background-color: #eee;">
         <div class="container py-5">
-
             <div class="row">
                 <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
                     <h5 class="font-weight-bold mb-3 text-center text-lg-start">Member</h5>
@@ -35,7 +29,8 @@
                                     @if (Auth::user()->id === $u->id)
                                     @else
                                         <li class="p-2 border-bottom" style="background-color: #eee;">
-                                            <a href="{{ url('/chat-page?id='.$u->id) }}" class="d-flex justify-content-between">
+                                            <a href="{{ url('/chat-page?id=' . $u->id) }}"
+                                                class="d-flex justify-content-between">
                                                 <div class="d-flex flex-row">
                                                     <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-8.webp"
                                                         alt="avatar"
@@ -58,12 +53,11 @@
                             <a href="{{ url('/logout') }}">logout</a>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="col-md-6 col-lg-7 col-xl-8">
-
-                    <ul class="list-unstyled" id="messages">
+                    <ul class="list-unstyled" id="messages" data-sender-id="{{ Auth::user()->id }}"
+                        data-reveiver-id="{{ $id }}">
                         @if ($messages)
                             @foreach ($messages as $m)
                                 <li class="d-flex justify-content-between mb-4">
@@ -134,18 +128,49 @@
         });
     </script>
     <script>
-        window.Echo.channel('chat')
+        var sender = "{{ Auth::user()->id }}";
+        var receiver = "{{ $id }}";
+        const senderChannel = 'chat.' + sender;
+        const receiverChannel = 'chat.' + receiver;
+
+        window.Echo.private(senderChannel)
+            .listen('MessageSent', (event) => {
+                console.log('User:', event.sender);
+                console.log('Message Content:', event.receiver);
+
+                if (event) {
+                    
+                    if (event.sender == sender && event.receiver == receiver) {
+                        const messageElement = displayMessage(event.user, event.message);
+                        const messageContainer = document.getElementById('messages');
+                        messageContainer.appendChild(messageElement);
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    }
+                    if (event.sender == receiver && event.receiver == sender) {
+                        const messageElement = displayMessage(event.user, event.message);
+                        const messageContainer = document.getElementById('messages');
+                        messageContainer.appendChild(messageElement);
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    }
+                } else {
+                    console.error('Error processing message.');
+                }
+            });
+
+        window.Echo.private(receiverChannel)
             .listen('MessageSent', (event) => {
                 console.log('User:', event.user);
                 console.log('Message Content:', event.message);
 
-                if (event.success) {
+                if (event) {
                     console.log('Message successfully processed.');
                     const messageElement = displayMessage(event.user, event.message);
                     const messageContainer = document.getElementById('messages');
+                    const senderId = messageContainer.getAttribute('data-sender-id');
+                    const receiverId = messageContainer.getAttribute('data-receiver-id');
                     messageContainer.appendChild(messageElement);
-
                     messageContainer.scrollTop = messageContainer.scrollHeight;
+
                 } else {
                     console.error('Error processing message.');
                 }
